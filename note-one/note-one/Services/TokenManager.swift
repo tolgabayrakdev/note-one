@@ -20,7 +20,49 @@ class TokenManager {
     }
     
     func getToken() -> String? {
-        return UserDefaults.standard.string(forKey: tokenKey)
+        guard let token = UserDefaults.standard.string(forKey: tokenKey) else {
+            return nil
+        }
+        
+        // Token'ın geçerliliğini kontrol et
+        if isTokenValid(token) {
+            return token
+        } else {
+            // Token süresi dolmuş, temizle
+            clearAuth()
+            return nil
+        }
+    }
+    
+    private func isTokenValid(_ token: String) -> Bool {
+        // JWT token formatı: header.payload.signature
+        let parts = token.components(separatedBy: ".")
+        guard parts.count == 3 else { return false }
+        
+        // Payload'ı decode et
+        guard let payloadData = base64UrlDecode(parts[1]),
+              let payload = try? JSONSerialization.jsonObject(with: payloadData) as? [String: Any],
+              let exp = payload["exp"] as? TimeInterval else {
+            return false
+        }
+        
+        // Expiry kontrolü (exp Unix timestamp)
+        let expirationDate = Date(timeIntervalSince1970: exp)
+        return expirationDate > Date()
+    }
+    
+    private func base64UrlDecode(_ base64Url: String) -> Data? {
+        var base64 = base64Url
+            .replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        
+        // Padding ekle
+        let remainder = base64.count % 4
+        if remainder > 0 {
+            base64 = base64.padding(toLength: base64.count + 4 - remainder, withPad: "=", startingAt: 0)
+        }
+        
+        return Data(base64Encoded: base64)
     }
     
     func saveUser(_ user: User) {
