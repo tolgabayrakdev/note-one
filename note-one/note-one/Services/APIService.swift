@@ -11,7 +11,7 @@ class APIService {
     static let shared = APIService()
     
     // Backend URL'ini buraya girin (localhost için simulator'da http://localhost:3000, gerçek cihazda IP adresi)
-    private let baseURL = "http://localhost:3000/api"
+    private let baseURL = "https://kendini-bul-production.up.railway.app/api"
     
     private init() {}
     
