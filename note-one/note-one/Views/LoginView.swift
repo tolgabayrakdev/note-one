@@ -74,12 +74,19 @@ struct LoginView: View {
                 .buttonStyle(.borderedProminent)
                 .disabled(authViewModel.isLoading || email.isEmpty || password.isEmpty)
                 
-                Button(action: {
-                    showRegister = true
-                }) {
-                    (Text("Hesabınız yok mu? ") + Text("Kayıt olun").underline())
+                HStack(spacing: 0) {
+                    Text("Hesabınız yok mu? ")
                         .font(.caption)
-                        .foregroundColor(.blue)
+                        .foregroundColor(.secondary)
+                    
+                    Button(action: {
+                        showRegister = true
+                    }) {
+                        Text("Kayıt olun")
+                            .font(.caption)
+                            .foregroundColor(.blue)
+                            .underline()
+                    }
                 }
             }
             .padding()
